@@ -1,5 +1,7 @@
 import { GetStaticProps } from 'next';
+import Head from 'next/head';
 import Header from '../components/Header';
+import Post from '../components/Post';
 
 import { getPrismicClient } from '../services/prismic';
 
@@ -26,7 +28,23 @@ interface HomeProps {
 }
 
 export default function Home() {
-  return <Header />;
+  const fakeData = [...Array(5).keys()].slice(1);
+
+  return (
+    <>
+      <Head>
+        <title>Spacetraveling | Home</title>
+      </Head>
+      <main className={commonStyles.page}>
+        <div className={commonStyles.container}>
+          {fakeData.map(data => (
+            <Post key={data} />
+          ))}
+          <p className={styles.morePosts}>Carregar mais posts</p>
+        </div>
+      </main>
+    </>
+  );
 }
 
 // export const getStaticProps = async () => {
