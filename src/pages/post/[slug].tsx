@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale';
 import { RichText } from 'prismic-dom';
 import Prismic from '@prismicio/client';
 
+import { useRouter } from 'next/router';
 import Header from '../../components/Header';
 import { getPrismicClient } from '../../services/prismic';
 
@@ -35,13 +36,14 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
+  const { isFallback } = useRouter();
   const rawText = post?.data.content.reduce((text, currentText) => {
     const textReading = RichText.asText(currentText.body);
 
     return `${text} ${textReading}`;
   }, '');
 
-  const timeReading = Math.ceil(rawText.split(' ').length / 200);
+  const timeReading = rawText && Math.ceil(rawText.split(' ').length / 200);
 
   return (
     <>
@@ -62,13 +64,22 @@ export default function Post({ post }: PostProps) {
       )}
       <main className={commonStyles.page}>
         <article className={commonStyles.container}>
-          {post?.data ? (
+          {isFallback && <p className={styles.title}>Carregando...</p>}
+          {post?.data && (
             <>
               <h1 className={styles.title}>{post.data.title}</h1>
               <div className={styles.infos}>
                 <div>
                   <FiCalendar />
-                  <time>{post.first_publication_date}</time>
+                  <time>
+                    {format(
+                      new Date(post.first_publication_date),
+                      'dd MMM yyyy',
+                      {
+                        locale: ptBR,
+                      }
+                    )}
+                  </time>
                 </div>
                 <div>
                   <FiUser />
@@ -87,8 +98,6 @@ export default function Post({ post }: PostProps) {
                 </div>
               ))}
             </>
-          ) : (
-            <p className={styles.title}>Carregando...</p>
           )}
         </article>
       </main>
@@ -106,7 +115,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: posts.results.map(post => ({
       params: {
-        slug: `/post/${post.uid}`,
+        slug: `${post.uid}`,
       },
     })),
     fallback: true,
@@ -119,22 +128,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('post', String(slug), {});
 
-  const post: Post = {
-    first_publication_date: format(
-      new Date(response.first_publication_date),
-      'dd MMM yyyy',
-      {
-        locale: ptBR,
-      }
-    ),
-    data: {
-      ...response.data,
-    },
-  };
-
   return {
     props: {
-      post,
+      post: response,
     },
   };
 };
