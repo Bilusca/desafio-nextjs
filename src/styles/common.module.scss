@@ -4,5 +4,22 @@
 
   .container {
     max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .exitPreview {
+    width: 100%;
+    margin-top: 5.5rem;
+    padding: 1.125rem 0;
+    background: var(--gray-100);
+    border-radius: 4px;
+    text-align: center;
+
+    a {
+      color: #1a1d23;
+      font-size: 1.125rem;
+      line-height: 1.375rem;
+      font-weight: 600;
+    }
   }
 }
