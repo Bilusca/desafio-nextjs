@@ -31,6 +31,7 @@ Running app
 ## Stack
 
 **Front-end:** NextJS, Sass.
+
 **Back-end:** Prismic CMS
 
 ## 🚀 About me
